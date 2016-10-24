@@ -25,5 +25,28 @@ namespace surveyapi.Models
             get;
             set;
         }
+
+        public List<Question> Questions {
+            get;
+            set;
+        }
+    }
+
+    public class Question
+    {
+        public int Number {
+            get;
+            set;
+        }
+
+        public string Text {
+            get;
+            set;
+        }
+
+        public List<string> Options {
+            get;
+            set;
+        }
     }
 }
