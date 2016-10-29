@@ -3,66 +3,63 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using MongoDB.Driver;
 using surveyapi.Models;
+using surveyapi.Repository;
 
 namespace surveyapi.Controllers
 {
-    [Route("api/surveys")]
+    [Route("api/[controller]")]
     public class SurveyController : Controller
     {   
-        protected IMongoClient _client;
-        protected IMongoDatabase _database;
-        protected IMongoCollection<Survey> _collection;
+        protected IRepository<Survey> _surveyRepo;
+        protected IRepository<Office> _officeRepo;
 
         public SurveyController()
         {
-            _client = new MongoClient();
-            _database = _client.GetDatabase("Surveys");
-            _collection = _database.GetCollection<Survey>("Survey");
+            _surveyRepo = new MongoRepository<Survey>();
+            _officeRepo = new OfficeRepository();
         }
         
-        // GET api/values
+        // GET api/survey
         [HttpGet]
-        public async Task<List<Survey>> Get()
+        public async Task<IEnumerable<Survey>> Get()
         {
-            var filter = Builders<Survey>.Filter.Empty;
-            return await _collection.Find(filter).ToListAsync();
+            return await _surveyRepo.GetAll();
         }
 
-        // GET api/values/5
+        // GET api/survey/5814d88775bb2b0be435f9e3
         [HttpGet("{id}")]
         public async Task<Survey> Get(string id)
         {
-            var filter = Builders<Survey>.Filter.Eq("_id", ObjectId.Parse(id));
-            var document = await _collection.Find(filter).FirstAsync();
+            var result = await _surveyRepo.GetSingle(id);
+
+            if (result is VccSurvey) {
+                ((VccSurvey)result).Offices = await _officeRepo.GetAll();
+            }
             
-            return document;
+            return result;
         }
 
-        // POST api/values
+        // POST api/survey
         [HttpPost]
         public async Task<Survey> Post([FromBody]Survey value)
         {
-            await _collection.InsertOneAsync(value);
-            return value;
+            return await _surveyRepo.Add(value);
         }
 
-        // PUT api/values/5
+        // PUT api/survey/5814d88775bb2b0be435f9e3
         [HttpPut("{id}")]
-        public Task<ReplaceOneResult> Put(string id, [FromBody]Survey survey)
+        public async Task<ReplaceOneResult> Put(string id, [FromBody]Survey survey)
         {
-            var filter = Builders<Survey>.Filter.Eq("_id", ObjectId.Parse(id));
-            return _collection.ReplaceOneAsync(filter,  survey);
+            return await _surveyRepo.Update(id, survey);
         }
 
-        // DELETE api/values/5
+        // DELETE api/survey/5814d88775bb2b0be435f9e3
         [HttpDelete("{id}")]
         public async Task<DeleteResult> Delete(string id)
         {
-            var filter = Builders<Survey>.Filter.Eq("_id", ObjectId.Parse(id));
-            return await _collection.DeleteOneAsync(filter);
+            return await _surveyRepo.Delete(id);
         }
     }
 }
