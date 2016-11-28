@@ -15,7 +15,7 @@ namespace surveyapi.Controllers
     [Route("api/[controller]")]
     public class OfficeController : Controller
     {
-        protected IRepository<Office> _officeRepo;
+        protected IOfficeRepository _officeRepo;
 
         public OfficeController()
         {
@@ -55,6 +55,13 @@ namespace surveyapi.Controllers
         public async Task<DeleteResult> Delete(string id)
         {
             return await _officeRepo.Delete(id);
+        }
+
+        [HttpGet]
+        [Route("FindNearByOffices")]
+        public async Task<IEnumerable<Office>> FindNearByOffices(double latitude, double longitude)
+        {
+            return await _officeRepo.FindNearByOffices(latitude, longitude);
         }
     }
 }

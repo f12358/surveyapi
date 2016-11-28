@@ -30,6 +30,15 @@ namespace surveyapi
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
+            services.AddCors(options =>
+            {
+                options.AddPolicy("CorsPolicy",
+                    builder => builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials() );
+            });
+            
             services.AddMvc()
                     .AddJsonOptions(opt =>
                     {
@@ -43,6 +52,10 @@ namespace surveyapi
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            // global policy - assign here or on each controller
+            app.UseCors("CorsPolicy");
+
 
             app.UseMvc();
         }
