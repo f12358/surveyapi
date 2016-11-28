@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace surveyapi
 {
@@ -28,7 +30,12 @@ namespace surveyapi
         public void ConfigureServices(IServiceCollection services)
         {
             // Add framework services.
-            services.AddMvc();
+            services.AddMvc()
+                    .AddJsonOptions(opt =>
+                    {
+                        var serializerSettings  = opt.SerializerSettings;
+                        serializerSettings.TypeNameHandling = TypeNameHandling.Auto;
+                    });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
