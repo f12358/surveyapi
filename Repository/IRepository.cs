@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using surveyapi.Models;
 
 namespace surveyapi.Repository
 {
@@ -15,5 +16,10 @@ namespace surveyapi.Repository
         Task<ReplaceOneResult> Update(string id, T survey);
 
         Task<DeleteResult> Delete(string id);
+    }
+
+    public interface IOfficeRepository : IRepository<Office>
+    {
+        Task<IEnumerable<Office>> FindNearByOffices(double latitude, double longitude);
     }
 }
